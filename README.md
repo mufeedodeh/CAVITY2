@@ -1,70 +1,183 @@
-# CAVITY 2
+const form = document.getElementById('calc-form');
+const resetButton = document.getElementById('reset-example');
+const unitSystem = document.getElementById('unit-system');
+const valveType = document.getElementById('valve-type');
+const valvePosition = document.getElementById('valve-position');
+const positionValue = document.getElementById('position-value');
+const flowInput = document.getElementById('flow');
+const flowUnit = document.getElementById('flow-unit');
+const puInput = document.getElementById('pu');
+const pdInput = document.getElementById('pd');
+const pbInput = document.getElementById('pb');
+const pvaInput = document.getElementById('pva');
+const sgInput = document.getElementById('sg');
+const fluidSelect = document.getElementById('fluid');
 
-Control valve cavitation, surge and noise analysis · by M. M. Odeh, after the 1988 USU CAVITY expert system
+const sigmaValue = document.getElementById('sigma-value');
+const deltaPValue = document.getElementById('delta-p-value');
+const cvValue = document.getElementById('cv-value');
+const noiseValue = document.getElementById('noise-value');
+const summaryTitle = document.getElementById('summary-title');
+const summaryText = document.getElementById('summary-text');
+const recommendationText = document.getElementById('recommendation-text');
+const statusPill = document.getElementById('status-pill');
 
-## UNITS
-US customary / SI
+const example = {
+  unitSystem: 'US',
+  valveType: 'butterfly',
+  valvePosition: 55,
+  flow: 1250,
+  flowUnit: 'gpm',
+  pu: 200,
+  pd: 35,
+  pb: 0,
+  pva: 0.5,
+  sg: 1,
+  fluid: 'water'
+};
 
-## FLOW
-cfs / gpm / L/s / m³/s
+const typeFactors = {
+  butterfly: 0.92,
+  globe: 1.12,
+  cone: 0.85,
+  ball: 0.98
+};
 
-## Report & files
-Reset example
+function assignExample() {
+  unitSystem.value = example.unitSystem;
+  valveType.value = example.valveType;
+  valvePosition.value = example.valvePosition;
+  flowInput.value = example.flow;
+  flowUnit.value = example.flowUnit;
+  puInput.value = example.pu;
+  pdInput.value = example.pd;
+  pbInput.value = example.pb;
+  pvaInput.value = example.pva;
+  sgInput.value = example.sg;
+  fluidSelect.value = example.fluid;
+  updateRangeLabel();
+  calculate();
+}
 
-## OPTION 1
-A single valve opening
+function updateRangeLabel() {
+  positionValue.textContent = `${valvePosition.value}%`;
+}
 
-You know the flow and pressures at one opening. Is the valve cavitating there?
+function formatNumber(value, digits = 2) {
+  if (!Number.isFinite(value)) return '—';
+  return Number(value).toLocaleString(undefined, {
+    maximumFractionDigits: digits,
+    minimumFractionDigits: digits
+  });
+}
 
-## OPTION 2
-The whole hydraulic system
+function conversionMap(flowValue, fromUnit) {
+  const gpm = {
+    gpm: flowValue,
+    cfs: flowValue * 448.831,
+    Lps: flowValue * 0.264172,
+    m3s: flowValue * 15850.323
+  };
 
-You know the reservoirs, pipes and fittings. CAVITY finds flows and pressures at every opening.
+  const valueInGpm = gpm[fromUnit] ?? flowValue;
+  return {
+    gpm: valueInGpm,
+    cfs: valueInGpm / 448.831,
+    Lps: valueInGpm / 3.78541,
+    m3s: valueInGpm / 15850.323
+  };
+}
 
-## OPTION 3
-Shutoff pressures + one test point
+function calculate() {
+  const flowValue = Number(flowInput.value || 0);
+  const pu = Number(puInput.value || 0);
+  const pd = Number(pdInput.value || 0);
+  const pb = Number(pbInput.value || 0);
+  const pva = Number(pvaInput.value || 0);
+  const sg = Number(sgInput.value || 1);
+  const position = Number(valvePosition.value || 0);
+  const flowInGpm = conversionMap(flowValue, flowUnit.value).gpm;
+  const deltaP = Math.max(pu - pd, 0.01);
 
-You know the no-flow pressures and one measured flow, from field tests or pump curves.
+  const sigma = (pd + pb - pva) / deltaP;
+  const cv = flowInGpm / (19.63 * Math.sqrt(Math.max(deltaP / sg, 0.01)));
+  const positionFactor = 0.55 + (position / 100) * 0.8;
+  const valveFactor = typeFactors[valveType.value] || 1;
+  const effectiveCv = cv * valveFactor * positionFactor;
 
-Method from CAVITY, an expert system for analysing and designing cavitating control valves, by Mufid M. Odeh and J. Paul Tullis, Utah Water Research Laboratory, Utah State University (1988). 
+  let status = 'Low';
+  let summary = 'No cavitation risk';
+  let text = 'The valve is operating above the cavitation threshold for a screening assessment.';
+  let recommendation = 'Proceed with a normal design review and validate with manufacturer data for the selected valve and trim.';
+  let pillClass = 'good';
 
-σ = (Pd + Pb − Pva)/(Pu − Pd), with Pu and Pd gauge pressures at the valve.
+  if (sigma < 0.6) {
+    status = 'High';
+    summary = 'Severe cavitation likely';
+    text = 'The cavitation index is low enough to suggest strong vapor formation, choked flow behavior and likely mechanical damage risk.';
+    recommendation = 'Reduce the pressure drop, increase downstream pressure, or use a valve trim designed for cavitation service with anti-cavitation modifications.';
+    pillClass = 'danger';
+  } else if (sigma < 1.0) {
+    status = 'Moderate';
+    summary = 'Cavitating conditions';
+    text = 'The valve is near the cavitation boundary and should be reviewed for performance and noise risk.';
+    recommendation = 'Consider a more suitable trim, larger downstream recovery, or staged pressure reduction to keep operation away from onset.';
+    pillClass = 'warn';
+  } else if (sigma < 1.3) {
+    status = 'Low to moderate';
+    summary = 'Transition zone';
+    text = 'The valve is in a marginal zone where cavitation may begin under transient or off-design conditions.';
+    recommendation = 'Monitor operating range and check field test data at the expected minimum upstream pressure and maximum flow.';
+    pillClass = 'warn';
+  }
 
-Built-in flow and cavitation curves are USU laboratory data for typical butterfly, globe, cone and ball valves.
+  const noise = sigma < 0.75 ? 'High' : sigma < 1.2 ? 'Moderate' : 'Low';
 
-CAVITY 2 adds pump-fed systems, ISA-RP75.23 terms, water hammer by the method of characteristics, a screening noise estimate, scenarios, field calibration, sequenced parallel valves, life-cycle cost and PDF reports. Use the results for screening and design studies; confirm critical installations with manufacturer data, a full transient analysis or model tests.
+  sigmaValue.textContent = formatNumber(sigma, 2);
+  deltaPValue.textContent = `${formatNumber(deltaP, 1)} ${unitSystem.value === 'US' ? 'psi' : 'kPa'}`;
+  cvValue.textContent = formatNumber(effectiveCv, 1);
+  noiseValue.textContent = noise;
+  summaryTitle.textContent = summary;
+  summaryText.textContent = text;
+  recommendationText.textContent = recommendation;
+  statusPill.textContent = status;
+  statusPill.style.background = pillClass === 'danger' ? 'rgba(239, 68, 68, 0.14)' : pillClass === 'warn' ? 'rgba(251, 191, 36, 0.14)' : 'rgba(34, 197, 94, 0.14)';
+  statusPill.style.color = pillClass === 'danger' ? '#fecaca' : pillClass === 'warn' ? '#fef3c7' : '#bbf7d0';
+  statusPill.style.borderColor = pillClass === 'danger' ? 'rgba(239, 68, 68, 0.5)' : pillClass === 'warn' ? 'rgba(251, 191, 36, 0.5)' : 'rgba(34, 197, 94, 0.5)';
 
-Your project is saved in this browser only. Use “Report & files” to save a project file or a PDF report.
+  const summaryBox = document.querySelector('.summary');
+  summaryBox.style.borderColor = pillClass === 'danger' ? 'rgba(239, 68, 68, 0.35)' : pillClass === 'warn' ? 'rgba(251, 191, 36, 0.35)' : 'rgba(34, 197, 94, 0.35)';
+  summaryBox.style.background = pillClass === 'danger' ? 'rgba(127, 29, 29, 0.12)' : pillClass === 'warn' ? 'rgba(120, 53, 15, 0.12)' : 'rgba(15, 118, 110, 0.12)';
+}
 
-## Inputs
-Results
+flowInput.addEventListener('input', calculate);
+unitSystem.addEventListener('change', () => {
+  if (unitSystem.value === 'SI') {
+    flowUnit.innerHTML = '<option value="Lps">L/s</option><option value="m3s">m³/s</option><option value="gpm">gpm</option><option value="cfs">cfs</option>';
+    puInput.value = 1378;
+    pdInput.value = 241;
+    pvaInput.value = 3.5;
+  } else {
+    flowUnit.innerHTML = '<option value="gpm">gpm</option><option value="cfs">cfs</option><option value="Lps">L/s</option><option value="m3s">m³/s</option>';
+    puInput.value = 200;
+    pdInput.value = 35;
+    pvaInput.value = 0.5;
+  }
+  calculate();
+});
 
-## CAVITY 2 - installable app
+valveType.addEventListener('change', calculate);
+valvePosition.addEventListener('input', () => {
+  updateRangeLabel();
+  calculate();
+});
 
-This folder is a complete app: open index.html from a web address and phones can install it to the home screen. It then works offline.
+Array.from(form.querySelectorAll('input, select')).forEach((field) => {
+  field.addEventListener('input', calculate);
+  field.addEventListener('change', calculate);
+});
 
-The files must be served from a web address (https://...). Opening index.html straight from your computer works for a quick look, but phones can only install it from a website. Two free ways to host it:
+resetButton.addEventListener('click', assignExample);
 
-### A) GitHub Pages (free, permanent)
-1. Sign in at https://github.com (create a free account if needed).
-2. Click "+" (top right) > "New repository". Name it cavity2, choose Public, and click "Create repository".
-3. On the next page click "uploading an existing file". Drag in EVERYTHING inside this cavity2 folder (index.html, sw.js, manifest.webmanifest and the icons folder). Click "Commit changes".
-4. Open the repository's Settings > Pages. Under "Build and deployment", set Source = "Deploy from a branch", Branch = "main", folder = "/ (root)". Click Save.
-5. Wait one or two minutes. Your app is at https://YOUR-USERNAME.github.io/cavity2/
-
-### B) Netlify Drop (free, drag and drop)
-1. Go to https://app.netlify.com/drop and sign up (free).
-2. Drag this whole cavity2 folder onto the page.
-3. Netlify gives you an address like https://something.netlify.app.
-
-### Install it on your phone
-- iPhone / iPad: open the address in Safari, tap Share, then "Add to Home Screen".
-- Android: open the address in Chrome, tap "Install app" in the app's header (or the browser menu > "Install app").
-
-Open it once while online; after that it runs without a connection.
-
-### Updating later
-Replace index.html (and the other files if they changed) in the same place. Phones pick up the new version the next time the app opens while online.
-
-### Your data
-Projects are saved on each device only. Use "Report & files" in the app to save a project file or a PDF report, and to move projects between your phone and computer.
+updateRangeLabel();
+assignExample();

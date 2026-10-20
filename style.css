@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CAVITY 2</title>
+    <meta name="description" content="CAVITY 2 valve cavitation, surge and noise screening app." />
+    <meta name="theme-color" content="#0f172a" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/favicon-32.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="./style.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">CAVITY 2</p>
+          <h1>Control valve cavitation, surge and noise analysis</h1>
+        </div>
+        <button id="reset-example" class="secondary-btn" type="button">Reset example</button>
+      </header>
+
+      <main class="layout">
+        <aside class="panel input-panel">
+          <h2>Inputs</h2>
+
+          <form id="calc-form">
+            <div class="field-group">
+              <label for="unit-system">Units</label>
+              <select id="unit-system">
+                <option value="US">US customary</option>
+                <option value="SI">SI</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="valve-type">Valve type</label>
+              <select id="valve-type">
+                <option value="butterfly">Butterfly</option>
+                <option value="globe">Globe</option>
+                <option value="cone">Cone</option>
+                <option value="ball">Ball</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="valve-position">Valve opening (%)</label>
+              <input id="valve-position" type="range" min="10" max="100" value="55" />
+              <div class="range-readout"><span id="position-value">55%</span></div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label for="flow">Flow</label>
+                <input id="flow" type="number" step="0.01" min="0" value="1250" />
+              </div>
+              <div class="field-group">
+                <label id="flow-unit-label" for="flow-unit">Flow unit</label>
+                <select id="flow-unit">
+                  <option value="gpm">gpm</option>
+                  <option value="cfs">cfs</option>
+                  <option value="Lps">L/s</option>
+                  <option value="m3s">m³/s</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label for="pu">Pu (upstream)</label>
+                <input id="pu" type="number" step="0.01" value="200" />
+              </div>
+              <div class="field-group">
+                <label for="pd">Pd (downstream)</label>
+                <input id="pd" type="number" step="0.01" value="35" />
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label for="pb">Pb (back pressure)</label>
+                <input id="pb" type="number" step="0.01" value="0" />
+              </div>
+              <div class="field-group">
+                <label for="pva">Pva (vapor pressure)</label>
+                <input id="pva" type="number" step="0.01" value="0.5" />
+              </div>
+            </div>
+
+            <div class="field-grid">
+              <div class="field-group">
+                <label for="sg">Specific gravity</label>
+                <input id="sg" type="number" step="0.01" min="0.1" value="1" />
+              </div>
+              <div class="field-group">
+                <label for="fluid">Fluid</label>
+                <select id="fluid">
+                  <option value="water">Water</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+            </div>
+          </form>
+        </aside>
+
+        <section class="panel results-panel">
+          <h2>Results</h2>
+
+          <div class="summary" id="summary-box">
+            <span class="status-pill" id="status-pill">Screening</span>
+            <h3 id="summary-title">No cavitation risk</h3>
+            <p id="summary-text">The valve is operating above the cavitation threshold for a screening assessment.</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-card accent">
+              <span class="label">σ</span>
+              <strong id="sigma-value">1.42</strong>
+            </div>
+            <div class="stat-card">
+              <span class="label">ΔP</span>
+              <strong id="delta-p-value">165 psi</strong>
+            </div>
+            <div class="stat-card">
+              <span class="label">Cv</span>
+              <strong id="cv-value">52.6</strong>
+            </div>
+            <div class="stat-card">
+              <span class="label">Noise</span>
+              <strong id="noise-value">Low</strong>
+            </div>
+          </div>
+
+          <div class="breakdown">
+            <h3>Interpretation</h3>
+            <ul id="interpretation-list">
+              <li>σ > 1.2: generally low cavitation risk.</li>
+              <li>0.6 < σ < 1.2: transitional cavitation may begin.</li>
+              <li>σ < 0.6: severe cavitation likely.</li>
+            </ul>
+          </div>
+
+          <div class="recommendation">
+            <h3>Recommendation</h3>
+            <p id="recommendation-text">Proceed with a normal design review and validate with manufacturer data for the selected valve and trim.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
