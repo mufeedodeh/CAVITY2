@@ -15,7 +15,6 @@
   --accent-strong: #0ea5e9;
   --good: #22c55e;
   --warn: #fbbf24;
-  --bad: #f97316;
   --danger: #ef4444;
 }
 
@@ -32,7 +31,7 @@ body {
 }
 
 .app-shell {
-  max-width: 1180px;
+  max-width: 1200px;
   margin: 0 auto;
 }
 
@@ -41,7 +40,7 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  margin-bottom: 24px;
+  margin-bottom: 18px;
 }
 
 .eyebrow {
@@ -69,6 +68,29 @@ h3 {
   font-size: 1.1rem;
 }
 
+.option-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 12px;
+  padding: 0.72rem 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.5);
+  color: var(--accent);
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(320px, 1fr) minmax(340px, 1.1fr);
@@ -82,6 +104,14 @@ h3 {
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.28);
   padding: 22px;
   backdrop-filter: blur(8px);
+}
+
+.option-form {
+  display: none;
+}
+
+.option-form.active {
+  display: block;
 }
 
 .field-group {
@@ -197,7 +227,7 @@ input[type="range"] {
 }
 
 .stat-card strong {
-  font-size: clamp(1.4rem, 2vw, 2rem);
+  font-size: clamp(1.2rem, 2vw, 1.9rem);
   line-height: 1.2;
 }
 
