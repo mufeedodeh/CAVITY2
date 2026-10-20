@@ -38,9 +38,16 @@ body {
 .topbar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   gap: 20px;
   margin-bottom: 18px;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .eyebrow {
@@ -125,7 +132,7 @@ label {
   font-weight: 600;
 }
 
-input, select, button {
+input, select, button, textarea {
   width: 100%;
   border-radius: 10px;
   border: 1px solid var(--border);
@@ -138,6 +145,11 @@ input, select, button {
 input[type="range"] {
   padding: 0;
   accent-color: var(--accent);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 84px;
 }
 
 .range-readout {
@@ -159,6 +171,11 @@ input[type="range"] {
   color: var(--accent);
   background: rgba(8, 47, 73, 0.45);
   cursor: pointer;
+}
+
+.secondary-btn.small {
+  padding: 0.55rem 0.8rem;
+  font-size: 0.8rem;
 }
 
 .summary {
@@ -231,7 +248,7 @@ input[type="range"] {
   line-height: 1.2;
 }
 
-.breakdown, .recommendation {
+.breakdown, .recommendation, .scenario-panel, .notes-panel {
   background: rgba(15, 23, 42, 0.52);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -252,6 +269,50 @@ input[type="range"] {
   line-height: 1.7;
 }
 
+.scenario-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.scenario-list {
+  display: grid;
+  gap: 10px;
+}
+
+.scenario-item {
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.scenario-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.scenario-name {
+  font-weight: 700;
+}
+
+.scenario-metrics {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.notes-panel label {
+  margin-bottom: 10px;
+}
+
 @media (max-width: 860px) {
   body {
     padding: 16px;
@@ -260,6 +321,10 @@ input[type="range"] {
   .topbar {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .header-actions {
+    justify-content: flex-start;
   }
 
   .layout {

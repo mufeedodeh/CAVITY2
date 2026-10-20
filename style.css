@@ -17,7 +17,13 @@
           <p class="eyebrow">CAVITY 2</p>
           <h1>Control valve cavitation, surge and noise analysis</h1>
         </div>
-        <button id="reset-example" class="secondary-btn" type="button">Reset example</button>
+        <div class="header-actions">
+          <button id="save-project" class="secondary-btn" type="button">Save project</button>
+          <button id="load-project" class="secondary-btn" type="button">Load project</button>
+          <button id="export-project" class="secondary-btn" type="button">Export JSON</button>
+          <button id="print-report" class="secondary-btn" type="button">Print report</button>
+          <button id="reset-example" class="secondary-btn" type="button">Reset example</button>
+        </div>
       </header>
 
       <nav class="option-tabs" aria-label="Analysis modes">
@@ -261,6 +267,19 @@
           <div class="recommendation">
             <h3>Recommendation</h3>
             <p id="recommendation-text">Proceed with a normal design review and validate with manufacturer data for the selected valve and trim.</p>
+          </div>
+
+          <div class="scenario-panel">
+            <div class="scenario-header">
+              <h3>Scenario comparison</h3>
+              <button id="add-scenario" class="secondary-btn small" type="button">Add current scenario</button>
+            </div>
+            <div id="scenario-list" class="scenario-list"></div>
+          </div>
+
+          <div class="notes-panel">
+            <label for="project-notes">Project notes</label>
+            <textarea id="project-notes" rows="4" placeholder="Add notes about the design basis, assumptions, or field observations."></textarea>
           </div>
         </section>
       </main>
